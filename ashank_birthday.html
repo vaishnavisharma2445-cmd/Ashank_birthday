@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Happy Birthday, Ashank! 🎉</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+    <!-- Load Firebase Libraries -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase variables accessible in window.onload
+        window.initializeApp = initializeApp;
+        window.getAuth = getAuth;
+        window.signInAnonymously = signInAnonymously;
+        window.signInWithCustomToken = signInWithCustomToken;
+        window.getFirestore = getFirestore;
+        window.setDoc = setDoc;
+        window.addDoc = addDoc;
+        window.collection = collection;
+
+        // Firebase Initialization and Auth Logic
+        window.initFirebase = async () => {
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase config is missing. Cannot initialize Firestore.");
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
+                // Sign in using custom token or anonymously
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                const userId = auth.currentUser?.uid || crypto.randomUUID();
+                window.db = db;
+                window.auth = auth;
+                window.userId = userId;
+
+                console.log("Firebase initialized. User ID:", userId);
+
+                // Log a 'Visit' to the public guestbook
+                const guestbookPath = `artifacts/${appId}/public/data/birthday_guestbook`;
+                const docRef = await addDoc(collection(db, guestbookPath), {
+                    userId: userId,
+                    timestamp: new Date(),
+                    presentFor: "Ashank",
+                    message: "Page was loaded."
+                });
+                console.log("Visit logged with ID: ", docRef.id);
+
+            } catch (error) {
+                console.error("Error during Firebase initialization or sign-in:", error);
+            }
+        };
+
+        // Call initialization function
+        window.initFirebase();
+    </script>
+
+    <style>
+        /* Define custom keyframes for the party animation */
+        @keyframes pulse-shadow {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 150, 0.8), 0 0 10px rgba(255, 255, 0, 0.5); }
+            50% { box-shadow: 0 0 50px rgba(0, 255, 255, 1), 0 0 20px rgba(255, 165, 0, 0.8); }
+        }
+        @keyframes sway {
+            0%, 100% { transform: rotate(1deg); }
+            50% { transform: rotate(-1deg); }
+        }
+        /* Custom styles for the cake button */
+        #revealButton {
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        #revealButton:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px #ff5a80;
+        }
+        /* Style for the main card */
+        .card-animate {
+            animation: pulse-shadow 4s infinite ease-in-out;
+        }
+        /* Set font to Inter for clean modern look */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+        /* Ensure the message box is initially hidden */
+        .hidden-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 1s ease-in-out, opacity 0.5s;
+            opacity: 0;
+        }
+        .visible-message {
+            max-height: 500px; /* Large enough to accommodate content */
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 flex items-center justify-center p-4">
+
+    <!-- Main Celebration Container -->
+    <div id="celebration-card" class="bg-white p-8 md:p-12 lg:p-16 rounded-3xl shadow-2xl max-w-xl w-full text-center card-animate transform transition duration-500 hover:scale-[1.02] mt-8 mb-8" role="main">
+
+        <!-- Initial Message and Confetti Trigger -->
+        <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600 mb-6 animate-pulse" id="main-heading">
+            A Surprise Awaits, Ashank! 🥳
+        </h1>
+
+        <p class="text-gray-700 text-lg mb-8">
+            This digital present is just for you. Click the cake to reveal your special message!
+        </p>
+
+        <!-- The Interactive Cake Button -->
+        <button id="revealButton" class="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:rotate-1" style="box-shadow: 0 9px #c53030;">
+            <!-- SVG Cake Icon for flair -->
+            <svg class="w-10 h-10 inline-block mr-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM5.555 6a1 1 0 011-1h6.89a1 1 0 011 1v.764c0 .385-.25.719-.6.85L12.5 8l1.355 1.386c.35.131.6.465.6.85V11a1 1 0 01-1 1h-6.89a1 1 0 01-1-1v-.764c0-.385.25-.719.6-.85L7.5 8l-1.355-1.386c-.35-.131-.6-.465-.6-.85V6zM9 14a1 1 011-1h2a1 1 011 1v1a1 1 01-1 1H9a1 1 01-1-1v-1z" clip-rule="evenodd"></path></svg>
+            Open Your Present!
+        </button>
+
+        <!-- Hidden Personalized Message Area -->
+        <div id="message-area" class="mt-8 hidden-message">
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-6 rounded-xl shadow-inner">
+                <h2 class="text-3xl font-bold mb-4 text-pink-600">The Message!</h2>
+                <p class="text-xl text-gray-800 leading-relaxed italic">
+                    My dearest Ashank,
+                    Wishing you the most incredible birthday ever! You're not just a best friend, you're the main character in the movie of my life. May your day be filled with all the joy, success, and amazing memes you deserve. Let's make this year unforgettable!
+                    <br><br>
+                    With all my love and endless good wishes,
+                    Your Best Friend
+                </p>
+                <div class="mt-4 text-sm text-gray-600 font-semibold">
+                    (P.S. Look at the fireworks!)
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for Firestore success message -->
+        <p id="firestore-status" class="mt-6 text-sm text-gray-400">Loading festive connection...</p>
+    </div>
+
+    <script>
+        // Use a simple retry mechanism for the confetti effect for maximum party success
+        const startConfetti = (duration) => {
+            const end = Date.now() + (duration);
+            const colors = ['#bb0000', '#ffffff', '#ffbf00', '#00ff00', '#0000ff'];
+
+            (function frame() {
+                confetti({
+                    particleCount: 2,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: colors
+                });
+                confetti({
+                    particleCount: 2,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: colors
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        };
+
+        const revealPresent = () => {
+            const button = document.getElementById('revealButton');
+            const messageArea = document.getElementById('message-area');
+            const heading = document.getElementById('main-heading');
+
+            // 1. Reveal the message
+            messageArea.classList.remove('hidden-message');
+            messageArea.classList.add('visible-message');
+
+            // 2. Change the heading text
+            heading.textContent = "Happy Birthday, Ashank! 🎂";
+
+            // 3. Start the non-stop party confetti (lasts 10 seconds)
+            startConfetti(10 * 1000); // 10 seconds of continuous confetti
+
+            // 4. Disable and restyle the button
+            button.disabled = true;
+            button.textContent = '🎉 Surprise Unlocked! 🎉';
+            button.classList.remove('bg-red-500', 'hover:bg-red-600');
+            button.classList.add('bg-green-500', 'opacity-70', 'cursor-default');
+
+            // 5. Log the present "opening" if Firebase is ready
+            if (window.db && window.userId) {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const messagePath = `artifacts/${appId}/public/data/present_openings`;
+                addDoc(collection(window.db, messagePath), {
+                    userId: window.userId,
+                    timestamp: new Date(),
+                    presentFor: "Ashank",
+                    action: "Opened Present"
+                })
+                .then(() => {
+                    document.getElementById('firestore-status').textContent = "Moment logged for posterity! ✨";
+                    document.getElementById('firestore-status').classList.add('text-green-500', 'font-bold');
+                })
+                .catch(error => {
+                    console.error("Error logging opening:", error);
+                    document.getElementById('firestore-status').textContent = "Moment logged (local error). ✨";
+                });
+            } else {
+                document.getElementById('firestore-status').textContent = "🎉 Moment Logged! (Offline Mode) 🎉";
+                document.getElementById('firestore-status').classList.add('text-green-500', 'font-bold');
+            }
+        };
+
+        window.onload = function() {
+            // Attach the click handler to the button
+            document.getElementById('revealButton').addEventListener('click', revealPresent);
+
+            // Update status message once everything is loaded
+            if (window.db) {
+                document.getElementById('firestore-status').textContent = "Ready to celebrate! Click the cake.";
+            }
+        };
+    </script>
+
+</body>
+</html>
